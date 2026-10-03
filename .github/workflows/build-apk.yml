@@ -9,6 +9,13 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write   # needed for creating GitHub Releases
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build APKs
@@ -25,24 +32,8 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Install Android Command Line Tools
-        run: |
-          # ساخت پوشه‌ها
-          mkdir -p $ANDROID_HOME/cmdline-tools
-          
-          # دانلود cmdline-tools
-          curl -fsSL -o commandlinetools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          
-          # استخراج
-          unzip -q commandlinetools.zip -d $ANDROID_HOME/cmdline-tools
-          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-          
-          # اضافه کردن به PATH
-          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
-          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
-
+      # The runner already ships with the Android SDK and cmdline-tools.
+      # We only accept licenses and make sure the needed packages exist.
       - name: Install required Android packages
         run: |
           yes | sdkmanager --licenses > /dev/null || true
@@ -51,11 +42,8 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Build Debug APK
-        run: ./gradlew clean assembleDebug --stacktrace
-
-      - name: Build Release APK (unsigned)
-        run: ./gradlew assembleRelease --stacktrace
+      - name: Build Debug and Release APKs
+        run: ./gradlew clean assembleDebug assembleRelease --stacktrace
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
@@ -63,42 +51,24 @@ jobs:
           name: contact-unifier-debug
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
-          if-no-files-found: warn
+          if-no-files-found: error
 
-      - name: Upload Release APK
+      - name: Upload Release APK (unsigned)
         uses: actions/upload-artifact@v4
         with:
           name: contact-unifier-release
           path: app/build/outputs/apk/release/app-release-unsigned.apk
           retention-days: 30
-          if-no-files-found: warn
+          if-no-files-found: error
 
-      - name: Create Release (on tag)
+      - name: Create GitHub Release (on tag)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: |
             app/build/outputs/apk/debug/app-debug.apk
             app/build/outputs/apk/release/app-release-unsigned.apk
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Print Build Info
+      - name: List build outputs
         if: always()
-        run: |
-          echo "=== Contact Unifier Build Complete ==="
-          echo "Debug APK expected at : app/build/outputs/apk/debug/app-debug.apk"
-          echo "Release APK expected at: app/build/outputs/apk/release/app-release-unsigned.apk"
-          echo ""
-          echo "=== Searching for APK files ==="
-          find app/build/outputs -name "*.apk" -type f -exec ls -lh {} \; 2>/dev/null || echo "No APK files found"
-          echo ""
-          echo "=== Directory structure ==="
-          if [ -d "app/build/outputs/apk" ]; then
-            ls -laR app/build/outputs/apk/
-          else
-            echo "Directory app/build/outputs/apk does not exist"
-            echo "This usually means the build steps failed."
-          fi
+        run: find app/build/outputs -name "*.apk" -type f -exec ls -lh {} \; 2>/dev/null || echo "No APK files found"
