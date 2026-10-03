@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Contact Unifier - Build & Test</title>
+    <style>
+        :root {
+            --bg: #f9fafb;
+            --fg: #1f2937;
+            --border: #e5e7eb;
+            --accent: #00897b;
+            --success: #10b981;
+            --code-bg: #f3f4f6;
+            color-scheme: light;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #111827;
+                --fg: #f3f4f6;
+                --border: #374151;
+                --code-bg: #1f2937;
+                color-scheme: dark;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+            margin: 0;
+            padding: 1.5rem;
+            padding-inline: max(1.5rem, env(safe-area-inset-left, 0px)) max(1.5rem, env(safe-area-inset-right, 0px));
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--accent);
+            font-size: 2rem;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .tagline {
+            color: var(--fg);
+            opacity: 0.7;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .step-box {
+            background: var(--code-bg);
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 6px;
+        }
+
+        .step-box h2 {
+            margin: 0 0 0.75rem 0;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .step-number {
+            background: var(--accent);
+            color: white;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .step-box p {
+            margin: 0.5rem 0;
+        }
+
+        code {
+            background: var(--bg);
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            color: var(--accent);
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--fg);
+        }
+
+        .note {
+            background: var(--accent);
+            background: color-mix(in srgb, var(--accent) 10%, transparent);
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 6px;
+        }
+
+        .note strong {
+            color: var(--accent);
+        }
+
+        .timeline {
+            display: grid;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 60px 1fr;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .timeline-time {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .success {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin: 0.25rem 0;
+        }
+
+        .icon {
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Contact Unifier</h1>
+        <p class="tagline">Build APK → Test on Emulator → Share with Family</p>
+
+        <div class="step-box">
+            <h2><span class="step-number">1</span> Create GitHub Repo (2 min)</h2>
+            <p>Go to <code>https://github.com/new</code></p>
+            <ul>
+                <li>Name: <code>ContactUnifier</code></li>
+                <li>Visibility: <code>Private</code></li>
+                <li>Create → Copy URL</li>
+            </ul>
+        </div>
+
+        <div class="step-box">
+            <h2><span class="step-number">2</span> Push Your Code (1 min)</h2>
+            <p>Run in PowerShell:</p>
+            <pre><code>cd D:\project\cc_project\contactMerge\ContactUnifier
+
+git init
+git config user.email "sir.mrm@gmail.com"
+git config user.name "Developer"
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/ContactUnifier.git
+git push -u origin main</code></pre>
+            <p><strong>Replace YOUR_USERNAME</strong> with your GitHub username</p>
+        </div>
+
+        <div class="step-box">
+            <h2><span class="step-number">3</span> Build in Cloud (5-7 min)</h2>
+            <p>Go to your GitHub repo → <strong>Actions</strong> tab</p>
+            <p>Watch <strong>"Build Contact Unifier APK"</strong>:</p>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <span class="timeline-time">Start</span>
+                    <span>🟡 Yellow = building</span>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-time">5-7 min</span>
+                    <span><span class="success">✅ Green = done</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="step-box">
+            <h2><span class="step-number">4</span> Download APK (1 min)</h2>
+            <p>When build succeeds:</p>
+            <ul>
+                <li>Click the build (green checkmark)</li>
+                <li>Scroll to <strong>Artifacts</strong></li>
+                <li>Download <code>contact-unifier-debug.zip</code></li>
+                <li>Extract to get <code>app-debug.apk</code></li>
+            </ul>
+        </div>
+
+        <div class="step-box">
+            <h2><span class="step-number">5</span> Test on Emulator (5 min)</h2>
+            <p>Run in terminal:</p>
+            <pre><code>adb devices
+adb install -r app-debug.apk
+adb shell am start -n com.contactunifier/.MainActivity</code></pre>
+            <p>Then test:</p>
+            <ul>
+                <li>✅ Splash screen animates</li>
+                <li>✅ Grants permissions</li>
+                <li>✅ Shows duplicate contacts (create test ones first)</li>
+                <li>✅ Merge flow works</li>
+                <li>✅ Language switching (EN ↔ FA)</li>
+            </ul>
+        </div>
+
+        <div class="note">
+            <strong>💡 TL;DR:</strong> Push to GitHub → GitHub builds automatically → Download APK → Test on emulator. No local Android SDK setup needed.
+        </div>
+
+        <div class="step-box">
+            <h2>What's Inside Your App</h2>
+            <ul>
+                <li>🎨 Material 3 UI (teal/gold/coral colors)</li>
+                <li>🌍 English + Persian with full RTL</li>
+                <li>🌙 Light/Dark mode</li>
+                <li>📱 Splash → Main → Detail → Settings screens</li>
+                <li>🔍 Duplicate detection algorithm</li>
+                <li>🔗 Contact merging with master location selection</li>
+                <li>✅ Fully localized strings (40+ each language)</li>
+            </ul>
+        </div>
+
+        <div class="step-box">
+            <h2>Next After Testing</h2>
+            <ul>
+                <li>Share APK with family/friends</li>
+                <li>Push updates to GitHub (automatic rebuild)</li>
+                <li>Deploy to Google Play Store (optional)</li>
+                <li>Sign release APK for production</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
