@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">یکپارچه‌ساز مخاطبین</string>
+    <string name="app_tagline">ادغام هوشمند مخاطبین تکراری</string>
+
+    <!-- Main Screen -->
+    <string name="main_title">مخاطبین تکراری</string>
+    <string name="scanning_contacts">در حال بررسی مخاطبین...</string>
+    <string name="no_duplicates_found">مخاطب تکراری پیدا نشد</string>
+    <string name="no_duplicates_description">تمام مخاطبین شما منحصربه‌فرد هستند!</string>
+    <string name="no_contacts_found">بدون مخاطب</string>
+    <string name="no_contacts_description">هیچ مخاطبی در دستگاه شما پیدا نشد.</string>
+
+    <!-- Detail Screen -->
+    <string name="choose_master_location">انتخاب محل ذخیره اصلی</string>
+    <string name="merge_button">ادغام و نگهداری در %s</string>
+    <string name="google_account">حساب گوگل</string>
+    <string name="device_storage">ذخیره‌سازی دستگاه</string>
+    <string name="sim_card">کارت سیم</string>
+
+    <!-- Confirmation Dialog -->
+    <string name="confirm_delete">تایید حذف</string>
+    <string name="delete_message">حذف %d مخاطب از %s؟</string>
+    <string name="yes_delete">بله، حذف کن</string>
+    <string name="cancel">انصراف</string>
+    <string name="merge_success">مخاطبین با موفقیت ادغام شدند!</string>
+
+    <!-- Settings Screen -->
+    <string name="settings">تنظیمات</string>
+    <string name="language">زبان</string>
+    <string name="english">انگلیسی</string>
+    <string name="persian">فارسی</string>
+    <string name="theme">پوسته</string>
+    <string name="system_theme">سیستم</string>
+    <string name="light_theme">روشن</string>
+    <string name="dark_theme">تیره</string>
+    <string name="about">درباره</string>
+    <string name="version">نسخه 1.0.0</string>
+    <string name="privacy_notice">اطلاعیه حریم خصوصی</string>
+    <string name="privacy_text">این برنامه فقط با مخاطبین محلی دستگاه شما کار می‌کند. هیچ داده‌ای به سرور یا طرف ثالث آپلود نمی‌شود.</string>
+
+    <!-- Permissions -->
+    <string name="permission_denied">اجازه رد شد</string>
+    <string name="contacts_permission_rationale">یکپارچه‌ساز مخاطبین برای تشخیص و ادغام مخاطبین تکراری به دسترسی مخاطبین نیاز دارد.</string>
+    <string name="grant_permission">اعطای اجازه</string>
+    <string name="open_settings">باز کردن تنظیمات</string>
+
+    <!-- Buttons -->
+    <string name="retry">دوباره تلاش</string>
+    <string name="undo">برگردان</string>
+    <string name="merge">ادغام</string>
+    <string name="delete">حذف</string>
+</resources>
