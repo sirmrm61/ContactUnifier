@@ -25,25 +25,29 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          accept-android-sdk-licenses: true
-          packages: >
-            platform-tools
-            platforms;android-34
-            platforms;android-35
-            build-tools;34.0.0
-            build-tools;35.0.0
-
-      # اگر باز هم مشکل داشت، این روش جایگزین را استفاده کنید (پیشنهادی):
-      # - name: Setup Android SDK (Alternative)
-      #   uses: nttld/setup-ndk@v1
-      #   با این روش جایگزین کامل‌تر:
-
-      - name: Accept Android licenses
+      - name: Install Android SDK manually
         run: |
-          yes | sdkmanager --licenses || true
+          # تنظیم متغیرهای محیطی
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
+          
+          # ساخت پوشه cmdline-tools
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          
+          # دانلود آخرین نسخه cmdline-tools
+          curl -o commandlinetools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          
+          # استخراج
+          unzip -q commandlinetools.zip -d $ANDROID_HOME/cmdline-tools
+          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+          
+          # اضافه کردن به PATH
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+          
+          # پذیرش لایسنس‌ها و نصب پکیج‌های مورد نیاز
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
