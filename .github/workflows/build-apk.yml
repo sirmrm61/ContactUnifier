@@ -25,17 +25,13 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Install Android SDK manually
+      - name: Install Android Command Line Tools
         run: |
-          # تنظیم متغیرهای محیطی
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
-          
-          # ساخت پوشه cmdline-tools
+          # ساخت پوشه‌ها
           mkdir -p $ANDROID_HOME/cmdline-tools
           
-          # دانلود آخرین نسخه cmdline-tools
-          curl -o commandlinetools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          # دانلود cmdline-tools
+          curl -fsSL -o commandlinetools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
           
           # استخراج
           unzip -q commandlinetools.zip -d $ANDROID_HOME/cmdline-tools
@@ -44,10 +40,13 @@ jobs:
           # اضافه کردن به PATH
           echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
           echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
-          
-          # پذیرش لایسنس‌ها و نصب پکیج‌های مورد نیاز
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
+
+      - name: Install required Android packages
+        run: |
           yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
