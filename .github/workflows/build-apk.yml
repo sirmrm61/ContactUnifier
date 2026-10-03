@@ -26,7 +26,10 @@ jobs:
           cache: gradle
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          api-levels: '34'
+          ndk-version: '26.0.10957603'
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
