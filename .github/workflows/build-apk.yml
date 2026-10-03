@@ -2,74 +2,73 @@ name: Build Contact Unifier APK
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, master ]
+    tags:
+      - 'v*'
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, master ]
   workflow_dispatch:
+
+permissions:
+  contents: write   # needed for creating GitHub Releases
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
+    name: Build APKs
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+      # The runner already ships with the Android SDK and cmdline-tools.
+      # We only accept licenses and make sure the needed packages exist.
+      - name: Install required Android packages
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
-    - name: Accept Android Licenses
-      run: |
-        echo y | sdkmanager "platforms;android-35"
-        echo y | sdkmanager "build-tools;35.0.0"
-        echo y | sdkmanager "platform-tools"
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
-    - name: Make Gradle Executable
-      run: chmod +x ./gradlew
+      - name: Build Debug and Release APKs
+        run: ./gradlew clean assembleDebug assembleRelease --stacktrace
 
-    - name: Build Debug APK
-      run: ./gradlew clean assembleDebug --stacktrace
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: contact-unifier-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+          if-no-files-found: error
 
-    - name: Build Release APK (unsigned)
-      run: ./gradlew assembleRelease --stacktrace
+      - name: Upload Release APK (unsigned)
+        uses: actions/upload-artifact@v4
+        with:
+          name: contact-unifier-release
+          path: app/build/outputs/apk/release/app-release-unsigned.apk
+          retention-days: 30
+          if-no-files-found: error
 
-    - name: Upload Debug APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: contact-unifier-debug
-        path: app/build/outputs/apk/debug/app-debug.apk
-        retention-days: 30
+      - name: Create GitHub Release (on tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/release/app-release-unsigned.apk
 
-    - name: Upload Release APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: contact-unifier-release
-        path: app/build/outputs/apk/release/app-release-unsigned.apk
-        retention-days: 30
-
-    - name: Create Release (on tag)
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          app/build/outputs/apk/debug/app-debug.apk
-          app/build/outputs/apk/release/app-release-unsigned.apk
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Print Build Info
-      if: always()
-      run: |
-        echo "=== Contact Unifier Build Complete ==="
-        echo "Debug APK: app/build/outputs/apk/debug/app-debug.apk"
-        echo "Release APK: app/build/outputs/apk/release/app-release-unsigned.apk"
-        ls -lh app/build/outputs/apk/*/
+      - name: List build outputs
+        if: always()
+        run: find app/build/outputs -name "*.apk" -type f -exec ls -lh {} \; 2>/dev/null || echo "No APK files found"
