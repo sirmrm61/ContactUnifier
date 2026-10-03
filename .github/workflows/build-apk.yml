@@ -7,7 +7,7 @@ on:
       - 'v*'
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch:   # امکان اجرای دستی از تب Actions
+  workflow_dispatch:
 
 jobs:
   build:
@@ -17,27 +17,34 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-    
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: gradle
-    
-      - name: Accept Android SDK Licenses
-        run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-    
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-    
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+
+      # اگر باز هم مشکل داشت، این روش جایگزین را استفاده کنید (پیشنهادی):
+      # - name: Setup Android SDK (Alternative)
+      #   uses: nttld/setup-ndk@v1
+      #   با این روش جایگزین کامل‌تر:
+
+      - name: Accept Android licenses
+        run: |
+          yes | sdkmanager --licenses || true
+
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-    
+
       - name: Build Debug APK
         run: ./gradlew clean assembleDebug --stacktrace
-        
+
       - name: Build Release APK (unsigned)
         run: ./gradlew assembleRelease --stacktrace
 
