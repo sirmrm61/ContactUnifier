@@ -3,7 +3,6 @@ name: Build Contact Unifier APK
 on:
   push:
     branches: [ main, master, develop ]
-    tags: [ 'v*' ]
   pull_request:
     branches: [ main, master, develop ]
   workflow_dispatch:
@@ -13,12 +12,10 @@ permissions:
 
 jobs:
   build:
-    name: Build APK
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -27,36 +24,14 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Create License Files
-        run: |
-          mkdir -p $ANDROID_SDK_ROOT/licenses
-          echo "8933bad161af4b39a7f61aeba3fa7414d1a63f4a" > $ANDROID_SDK_ROOT/licenses/android-sdk-license
-          echo "d56f5187479451eabf01fb78af6dfcb131b33910" > $ANDROID_SDK_ROOT/licenses/intel-android-extra-license
-          echo "84831b9409646a918e30573bab4c9c91346d8abd" > $ANDROID_SDK_ROOT/licenses/android-sdk-preview-license
-
-      - name: Install SDK Platforms (no sdkmanager calls needed - already installed)
-        run: |
-          echo "Android SDK is already configured on GitHub runners"
-          ls -la $ANDROID_SDK_ROOT/platforms/ | head -10 || echo "Checking build-tools instead..."
-          ls -la $ANDROID_SDK_ROOT/build-tools/ | head -10 || echo "SDK configured, proceeding..."
-
-      - name: Make Gradle Wrapper Executable
+      - name: Make Gradle executable
         run: chmod +x ./gradlew
 
       - name: Build Debug APK
-        run: ./gradlew clean assembleDebug --stacktrace -x lint
+        run: ./gradlew clean assembleDebug
 
-      - name: Build Release APK (unsigned)
-        run: ./gradlew assembleRelease --stacktrace -x lint || true
-
-      - name: Check Build Outputs
-        if: always()
-        run: |
-          echo "=== Looking for APK files ==="
-          find app/build/outputs -type f -name "*.apk" -ls 2>/dev/null || echo "No APK files generated"
+      - name: Build Release APK
+        run: ./gradlew assembleRelease || true
 
       - name: Upload Debug APK
         if: success()
@@ -64,7 +39,6 @@ jobs:
         with:
           name: contact-unifier-debug
           path: app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 30
 
       - name: Upload Release APK
         if: always()
@@ -72,26 +46,9 @@ jobs:
         with:
           name: contact-unifier-release
           path: app/build/outputs/apk/release/app-release-unsigned.apk
-          retention-days: 30
 
-      - name: Create Release (on tag)
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            app/build/outputs/apk/debug/app-debug.apk
-            app/build/outputs/apk/release/app-release-unsigned.apk
-
-      - name: Build Summary
-        if: always()
-        run: |
-          echo "=========================================="
-          echo "Contact Unifier Build Complete"
-          echo "=========================================="
-          if [ -f app/build/outputs/apk/debug/app-debug.apk ]; then
-            SIZE=$(stat -f%z app/build/outputs/apk/debug/app-debug.apk 2>/dev/null || stat -c%s app/build/outputs/apk/debug/app-debug.apk 2>/dev/null)
-            echo "✅ Debug APK built: $(numfmt --to=iec-i --suffix=B -- $SIZE 2>/dev/null || echo "$SIZE bytes")"
-          else
-            echo "❌ Debug APK build failed - check logs"
-          fi
-          echo "=========================================="
+          files: app/build/outputs/apk/debug/app-debug.apk
