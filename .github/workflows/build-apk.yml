@@ -71,8 +71,4 @@ jobs:
 
       - name: List build outputs
         if: always()
-<<<<<<< HEAD
         run: find app/build/outputs -name "*.apk" -type f -exec ls -lh {} \; 2>/dev/null || echo "No APK files found"
-=======
-        run: find app/build/outputs -name "*.apk" -type f -exec ls -lh {} \; 2>/dev/null || echo "No APK files found"
->>>>>>> 25a35aab6f58236567a510ba3550819a91d24d0c
